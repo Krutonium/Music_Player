@@ -12,6 +12,7 @@ namespace Music_Player
 {
     class Program
     {
+        public static double volume = 0.1;
         static async Task Main(string[] args)
         {
             Program prog = new Program();
@@ -65,6 +66,7 @@ namespace Music_Player
                 await player.LoadAsync(song[index]);
             }
 
+            player.Volume = volume;
             player.Play();
             //await ffmpeg.GetThumbnailAsync(new InputFile(song[index]), new OutputFile("/home/krutonium/currentsong.png"));
             
@@ -87,6 +89,14 @@ namespace Music_Player
                         case ConsoleKey.F8:
                             player.Stop();
                             break;
+                        case ConsoleKey.UpArrow:
+                            volume += 0.05;
+                            player.Volume = volume;
+                            break;
+                        case ConsoleKey.DownArrow:
+                            volume -= 0.05;
+                            player.Volume = volume;
+                            break;
                     }
                 }
 
@@ -98,7 +108,6 @@ namespace Music_Player
                 {
                     File.WriteAllText("/home/krutonium/currentsong.txt", player.Title + " | " + player.Artist);
                 }
-
             }
             Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
             player.Dispose();

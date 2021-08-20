@@ -13,10 +13,12 @@ namespace Music_Player
     class Program
     {
         public static double volume = 0.1;
+        public static List<string> songs = new List<string>();
+        public static Program prog = new Program();
         static async Task Main(string[] args)
         {
-            Program prog = new Program();
-            List<string> songs = prog.LoadSongs();
+            
+            songs = prog.LoadSongs();
             Random rand = new Random();
             while (true)
             {
@@ -27,7 +29,9 @@ namespace Music_Player
         private List<string> LoadSongs()
         {
             Console.WriteLine("Loading Songs");
-            List<string> AllFiles = Directory.GetFiles("/home/krutonium/Music/", "*.*", SearchOption.AllDirectories)
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            List<string> AllFiles = Directory.GetFiles("/home/krutonium/Music", "*.*", SearchOption.AllDirectories)
                 .ToList();
             List<string> wantedFiles = new List<string>();
             foreach (var song in AllFiles)
@@ -38,12 +42,14 @@ namespace Music_Player
                     wantedFiles.Add(song);
                 }
             }
-            Console.WriteLine("Got {0} Songs", wantedFiles.Count);
+            
             if (wantedFiles.Count == 0)
             {
                 Console.WriteLine("Found no valid music! Must be MP3, WAV, or FLAC");
                 Environment.Exit(1);
             }
+            watch.Stop();
+            Console.WriteLine("Got {0} Songs in {1} milliseconds", wantedFiles.Count, watch.Elapsed.Milliseconds);
             return wantedFiles;
         }
 
@@ -96,6 +102,11 @@ namespace Music_Player
                         case ConsoleKey.DownArrow:
                             volume -= 0.05;
                             player.Volume = volume;
+                            break;
+                        case ConsoleKey.F5:
+                            Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+                            Console.WriteLine();
+                            prog.LoadSongs();
                             break;
                     }
                 }

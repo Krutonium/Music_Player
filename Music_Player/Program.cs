@@ -19,7 +19,7 @@ namespace Music_Player
             Random rand = new Random();
             while (true)
             {
-                await prog.PlaySong(songs, rand.Next(0, songs.Count));
+                await prog.PlaySong(songs, rand.Next(0, songs.Count - 1));
             }
         }
 
@@ -67,14 +67,41 @@ namespace Music_Player
 
             player.Play();
             //await ffmpeg.GetThumbnailAsync(new InputFile(song[index]), new OutputFile("/home/krutonium/currentsong.png"));
-            File.WriteAllText("/home/krutonium/currentsong.txt", player.Title + " | " + player.Artist);
+            
+            Console.WriteLine("Playing \"{0}\" by \"{1}\" from \"{2}\"", player.Title, player.Artist, player.Album);
             while (player.State == PlaybackState.Paused | player.State == PlaybackState.Playing)
             {
                 System.Threading.Thread.Sleep(1000);
                 Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
                 Console.Write("{0:mm\\:ss} | {1:mm\\:ss}", player.Position, player.Duration);
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    switch (key.Key)
+                    {
+                        case ConsoleKey.F7:
+                            if (player.State == PlaybackState.Paused)
+                            { player.Play(); } else
+                            { player.Pause(); }
+                            break;
+                        case ConsoleKey.F8:
+                            player.Stop();
+                            break;
+                    }
+                }
+
+                if (player.State == PlaybackState.Paused)
+                {
+                    File.WriteAllText("/home/krutonium/currentsong.txt","");
+                }
+                else
+                {
+                    File.WriteAllText("/home/krutonium/currentsong.txt", player.Title + " | " + player.Artist);
+                }
+
             }
             Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+            player.Dispose();
         }
     }
 }
